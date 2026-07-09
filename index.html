@@ -204,6 +204,28 @@
           <div id="dashboard-metas"><div class="empty" style="padding:16px"><div class="empty-icon" style="font-size:20px">◎</div>Sin metas creadas.</div></div>
         </div>
       </div>
+      <!-- HISTÓRICO ACUMULADO -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px">
+        <div class="kpi" style="border-color:rgba(127,255,110,.3)">
+          <div style="position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent)"></div>
+          <div class="kpi-label">Ingresos totales</div>
+          <div class="kpi-value green" id="hist-ingresos">S/ 0</div>
+          <div class="kpi-sub" id="hist-ingresos-sub">histórico</div>
+        </div>
+        <div class="kpi" style="border-color:rgba(255,107,107,.3)">
+          <div style="position:absolute;top:0;left:0;right:0;height:2px;background:var(--danger)"></div>
+          <div class="kpi-label">Gastos totales</div>
+          <div class="kpi-value" style="color:var(--danger)" id="hist-gastos">S/ 0</div>
+          <div class="kpi-sub" id="hist-gastos-sub">histórico</div>
+        </div>
+        <div class="kpi" style="border-color:rgba(167,139,250,.3)">
+          <div style="position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent2)"></div>
+          <div class="kpi-label">Balance acumulado</div>
+          <div class="kpi-value purple" id="hist-balance">S/ 0</div>
+          <div class="kpi-sub" id="hist-meses">desde el inicio</div>
+        </div>
+      </div>
+
       <div class="card">
         <div class="card-header"><div class="card-title">Fuentes de ingreso</div><span class="tag tag-weekly">activas</span></div>
         <div class="source-row"><div class="source-left"><div class="source-dot" style="background:#f59e0b"></div><div><div class="source-name">Hotmart</div><div class="source-freq">Variable · productos digitales</div></div></div><div class="source-amount" id="src-hotmart" style="color:#f59e0b">S/ 0</div></div>
@@ -596,7 +618,28 @@ function setSyncStatus(ok) { document.getElementById('sync-dot').className='sync
 function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
 
 // ── Render ────────────────────────────────────
-function renderAll() { renderKPIs(); renderRecentTx(); renderFuentes(); renderListas(); renderAhorros(); renderMetas(); renderDashboardMetas(); }
+function renderAll() { renderKPIs(); renderHistorico(); renderRecentTx(); renderFuentes(); renderListas(); renderAhorros(); renderMetas(); renderDashboardMetas(); }
+
+function renderHistorico() {
+  const totalIng  = state.ingresos.reduce((a,b)=>a+(+b.monto||0),0);
+  const totalGas  = state.gastos.reduce((a,b)=>a+(+b.monto||0),0);
+  const balance   = totalIng - totalGas;
+  // Meses únicos con actividad
+  const meses = new Set([
+    ...state.ingresos.map(i=>(i.fecha||'').slice(0,7)),
+    ...state.gastos.map(g=>(g.fecha||'').slice(0,7))
+  ]);
+  meses.delete('');
+  const nMeses = meses.size;
+  document.getElementById('hist-ingresos').textContent    = fmt(totalIng);
+  document.getElementById('hist-ingresos-sub').textContent= `${state.ingresos.length} registros en total`;
+  document.getElementById('hist-gastos').textContent      = fmt(totalGas);
+  document.getElementById('hist-gastos-sub').textContent  = `${state.gastos.length} registros en total`;
+  document.getElementById('hist-balance').textContent     = fmt(balance);
+  document.getElementById('hist-balance').style.color     = balance>=0?'var(--accent2)':'var(--danger)';
+  document.getElementById('hist-meses').textContent       = nMeses>0?`${nMeses} mes${nMeses!==1?'es':''} registrados`:'desde el inicio';
+}
+
 
 function renderKPIs() {
   const {totalIng,totalGas,ingMes,gasMes}=getTotalesMes();
