@@ -287,13 +287,13 @@
           <option value="todos">Todos los años</option>
           <option value="2026" selected>2026</option>
           <option value="2027">2027</option>
+          <option value="2028">2028</option>
+          <option value="2029">2029</option>
         </select>
         <select class="filter-select" id="filtro-ing-mes" onchange="renderListas()">
           <option value="todos">Todo el año</option>
-          <option value="01">Enero</option><option value="02">Febrero</option><option value="03">Marzo</option>
-          <option value="04">Abril</option><option value="05">Mayo</option><option value="06">Junio</option>
-          <option value="07">Julio</option><option value="08">Agosto</option><option value="09">Septiembre</option>
-          <option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option>
+          <option value="06">Junio</option><option value="07">Julio</option><option value="08">Agosto</option>
+          <option value="09">Septiembre</option><option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option>
         </select>
         <div id="resumen-ing-filtro" style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px"></div>
       </div>
@@ -308,13 +308,13 @@
           <option value="todos">Todos los años</option>
           <option value="2026" selected>2026</option>
           <option value="2027">2027</option>
+          <option value="2028">2028</option>
+          <option value="2029">2029</option>
         </select>
         <select class="filter-select" id="filtro-gas-mes" onchange="renderListas()">
           <option value="todos">Todo el año</option>
-          <option value="01">Enero</option><option value="02">Febrero</option><option value="03">Marzo</option>
-          <option value="04">Abril</option><option value="05">Mayo</option><option value="06">Junio</option>
-          <option value="07">Julio</option><option value="08">Agosto</option><option value="09">Septiembre</option>
-          <option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option>
+          <option value="06">Junio</option><option value="07">Julio</option><option value="08">Agosto</option>
+          <option value="09">Septiembre</option><option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option>
         </select>
         <div id="resumen-gas-filtro" style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px"></div>
       </div>
@@ -361,15 +361,12 @@
         <select class="filter-select" id="filtro-anio" onchange="renderResumen()">
           <option value="2026">2026</option>
           <option value="2027">2027</option>
+          <option value="2028">2028</option>
+          <option value="2029">2029</option>
           <option value="todos">Todos los años</option>
         </select>
         <select class="filter-select" id="filtro-mes" onchange="renderResumen()">
           <option value="todos">Todo el año</option>
-          <option value="01">Enero</option>
-          <option value="02">Febrero</option>
-          <option value="03">Marzo</option>
-          <option value="04">Abril</option>
-          <option value="05">Mayo</option>
           <option value="06">Junio</option>
           <option value="07">Julio</option>
           <option value="08">Agosto</option>
@@ -1266,8 +1263,43 @@ function renderCostos() {
 document.getElementById('fecha-hoy').textContent=new Date().toLocaleDateString('es-PE',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
 // Pre-seleccionar mes actual en filtro resumen
 const _hoy = new Date();
-document.getElementById('filtro-anio').value = String(_hoy.getFullYear());
-document.getElementById('filtro-mes').value  = String(_hoy.getMonth()+1).padStart(2,'0');
+const _anioActual = String(_hoy.getFullYear());
+const _mesActual  = String(_hoy.getMonth()+1).padStart(2,'0');
+
+// Meses completos para años futuros
+const _TODOS_MESES = [
+  ['01','Enero'],['02','Febrero'],['03','Marzo'],['04','Abril'],['05','Mayo'],['06','Junio'],
+  ['07','Julio'],['08','Agosto'],['09','Septiembre'],['10','Octubre'],['11','Noviembre'],['12','Diciembre']
+];
+const _MESES_2026 = _TODOS_MESES.filter(([v])=>v>='06'); // Solo Jun-Dic para 2026
+
+function actualizarMeses(selectAnioId, selectMesId) {
+  const anio = document.getElementById(selectAnioId).value;
+  const sel  = document.getElementById(selectMesId);
+  const prev = sel.value;
+  const meses = (anio === '2026') ? _MESES_2026 : _TODOS_MESES;
+  sel.innerHTML = '<option value="todos">Todo el año</option>' +
+    meses.map(([v,n])=>`<option value="${v}">${n}</option>`).join('');
+  // Restaurar selección si sigue siendo válida
+  if ([...sel.options].some(o=>o.value===prev)) sel.value = prev;
+}
+
+document.getElementById('filtro-anio').addEventListener('change', ()=>actualizarMeses('filtro-anio','filtro-mes'));
+document.getElementById('filtro-ing-anio').addEventListener('change', ()=>actualizarMeses('filtro-ing-anio','filtro-ing-mes'));
+document.getElementById('filtro-gas-anio').addEventListener('change', ()=>actualizarMeses('filtro-gas-anio','filtro-gas-mes'));
+
+document.getElementById('filtro-anio').value = _anioActual;
+actualizarMeses('filtro-anio','filtro-mes');
+document.getElementById('filtro-mes').value = _mesActual >= '06' ? _mesActual : '06';
+
+document.getElementById('filtro-ing-anio').value = _anioActual;
+actualizarMeses('filtro-ing-anio','filtro-ing-mes');
+document.getElementById('filtro-ing-mes').value = _mesActual >= '06' ? _mesActual : '06';
+
+document.getElementById('filtro-gas-anio').value = _anioActual;
+actualizarMeses('filtro-gas-anio','filtro-gas-mes');
+document.getElementById('filtro-gas-mes').value = _mesActual >= '06' ? _mesActual : '06';
+
 loadData();
 </script>
 </body>
