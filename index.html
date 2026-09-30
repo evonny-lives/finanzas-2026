@@ -150,8 +150,51 @@
   .sync-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);}
   .sync-dot.ok{background:var(--accent);}.sync-dot.err{background:var(--danger);}
   ::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+  /* RESUMEN STYLES */
+  .filter-bar{display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap;align-items:center;}
+  .filter-select{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 14px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;outline:none;cursor:pointer;}
+  .filter-select:focus{border-color:var(--accent);}
+  .filter-select option{background:var(--surface);}
+  .resumen-result{border-radius:16px;padding:28px;margin-bottom:24px;text-align:center;}
+  .resumen-result.positivo{background:rgba(127,255,110,.06);border:1px solid rgba(127,255,110,.2);}
+  .resumen-result.negativo{background:rgba(255,107,107,.06);border:1px solid rgba(255,107,107,.2);}
+  .resumen-result.neutral{background:var(--surface);border:1px solid var(--border);}
+  .resumen-balance-label{font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:8px;}
+  .resumen-balance-value{font-family:'Syne',sans-serif;font-size:48px;font-weight:800;letter-spacing:-2px;line-height:1;}
+  .resumen-balance-sub{font-size:13px;color:var(--muted);margin-top:8px;}
+  .resumen-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;}
+  /* COSTOS FIJOS */
+  .costo-row{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--border);}
+  .costo-row:last-child{border-bottom:none;}
+  .costo-left{display:flex;align-items:center;gap:12px;}
+  .costo-cat-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  .costo-name{font-size:13px;font-weight:500;}
+  .costo-cat{font-size:11px;color:var(--muted);margin-top:2px;}
+  .costo-right{display:flex;align-items:center;gap:12px;}
+  .costo-monto{font-family:'DM Mono',monospace;font-size:14px;font-weight:500;color:var(--warning);}
+  .costo-total-bar{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px;margin-bottom:20px;}
+  .costo-total-label{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;}
+  .costo-total-value{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;color:var(--warning);letter-spacing:-1px;}
+  .costo-total-sub{font-size:12px;color:var(--muted);margin-top:4px;}
+  .cat-pill{display:inline-block;font-size:10px;font-family:'DM Mono',monospace;padding:2px 8px;border-radius:99px;}
+  /* BOTTOM NAV */
   .bottom-nav{display:none;}
-  @media(max-width:768px){.sidebar{display:none;}.main{margin-left:0;padding:20px 16px 90px;}.kpi-grid{grid-template-columns:repeat(2,1fr);}.two-col{grid-template-columns:1fr;}.metas-grid{grid-template-columns:1fr;}.page-title{font-size:20px;}.bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);z-index:200;padding:8px 0 12px;}.bottom-nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:6px 4px;color:var(--muted);transition:color .15s;font-family:'DM Mono',monospace;font-size:10px;}.bottom-nav-item.active{color:var(--accent);}.bottom-nav-item .bnav-icon{font-size:18px;line-height:1;}.bottom-nav-item .bnav-label{font-size:10px;letter-spacing:.3px;}}
+  @media(max-width:768px){
+    .sidebar{display:none;}
+    .main{margin-left:0;padding:20px 16px 90px;}
+    .kpi-grid{grid-template-columns:repeat(2,1fr);}
+    .two-col{grid-template-columns:1fr;}
+    .metas-grid{grid-template-columns:1fr;}
+    .page-title{font-size:20px;}
+    .resumen-kpis{grid-template-columns:1fr;}
+    .resumen-balance-value{font-size:36px;}
+    .filter-bar{gap:8px;}
+    .bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);z-index:200;padding:8px 0 12px;overflow-x:auto;}
+    .bottom-nav-item{flex:1;min-width:56px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:6px 4px;color:var(--muted);transition:color .15s;font-family:'DM Mono',monospace;font-size:10px;}
+    .bottom-nav-item.active{color:var(--accent);}
+    .bottom-nav-item .bnav-icon{font-size:18px;line-height:1;}
+    .bottom-nav-item .bnav-label{font-size:9px;letter-spacing:.3px;white-space:nowrap;}
+  }
 </style>
 </head>
 <body>
@@ -168,6 +211,8 @@
       <div class="nav-item" data-view="gastos"><span class="nav-icon">↓</span><span>Gastos</span></div>
       <div class="nav-item" data-view="ahorros"><span class="nav-icon">◈</span><span>Ahorros</span></div>
       <div class="nav-item" data-view="metas"><span class="nav-icon">◎</span><span>Metas</span></div>
+      <div class="nav-item" data-view="resumen"><span class="nav-icon">📊</span><span>Resumen</span></div>
+      <div class="nav-item" data-view="costos"><span class="nav-icon">📌</span><span>Costo de vida</span></div>
     </nav>
     <div class="sidebar-footer">
       <div class="sync-status"><div class="sync-dot" id="sync-dot"></div><span id="sync-label">Cargando...</span></div>
@@ -225,7 +270,6 @@
           <div class="kpi-sub" id="hist-meses">desde el inicio</div>
         </div>
       </div>
-
       <div class="card">
         <div class="card-header"><div class="card-title">Fuentes de ingreso</div><span class="tag tag-weekly">activas</span></div>
         <div class="source-row"><div class="source-left"><div class="source-dot" style="background:#f59e0b"></div><div><div class="source-name">Hotmart</div><div class="source-freq">Variable · productos digitales</div></div></div><div class="source-amount" id="src-hotmart" style="color:#f59e0b">S/ 0</div></div>
@@ -262,8 +306,6 @@
         </div>
         <button class="btn btn-primary" onclick="showModal('meta')">+ Nueva meta</button>
       </div>
-
-      <!-- Resumen libre -->
       <div class="card" style="margin-bottom:20px">
         <div class="card-header"><div class="card-title">💰 Saldo libre (sin asignar)</div></div>
         <div style="display:flex;align-items:baseline;gap:12px">
@@ -271,15 +313,88 @@
           <div style="font-size:12px;color:var(--muted)" id="saldo-libre-desc">del total de tus ahorros</div>
         </div>
       </div>
-
       <div class="metas-grid" id="metas-grid">
         <div class="empty" style="grid-column:1/-1"><div class="empty-icon">◎</div>No tienes metas aún.<br>Crea tu primera meta con el botón de arriba.</div>
       </div>
-
-      <!-- Proyección -->
       <div class="card">
         <div class="card-header"><div class="card-title">Proyección mensual</div><div style="font-size:12px;color:var(--muted)">Basado en flujo actual</div></div>
         <div id="proyeccion-text" style="color:var(--muted);font-size:13px;line-height:1.7">Registra ingresos y gastos para ver tu proyección.</div>
+      </div>
+    </div>
+
+    <!-- RESUMEN -->
+    <div class="view" id="view-resumen">
+      <div class="page-header">
+        <div class="page-title">Resumen</div>
+      </div>
+      <div class="filter-bar">
+        <select class="filter-select" id="filtro-anio" onchange="renderResumen()">
+          <option value="2026">2026</option>
+          <option value="2027">2027</option>
+          <option value="todos">Todos los años</option>
+        </select>
+        <select class="filter-select" id="filtro-mes" onchange="renderResumen()">
+          <option value="todos">Todo el año</option>
+          <option value="01">Enero</option>
+          <option value="02">Febrero</option>
+          <option value="03">Marzo</option>
+          <option value="04">Abril</option>
+          <option value="05">Mayo</option>
+          <option value="06">Junio</option>
+          <option value="07">Julio</option>
+          <option value="08">Agosto</option>
+          <option value="09">Septiembre</option>
+          <option value="10">Octubre</option>
+          <option value="11">Noviembre</option>
+          <option value="12">Diciembre</option>
+        </select>
+      </div>
+      <!-- Resultado principal -->
+      <div id="resumen-result-card" class="resumen-result neutral">
+        <div class="resumen-balance-label" id="resumen-periodo-label">Selecciona un período</div>
+        <div class="resumen-balance-value" id="resumen-balance-value">S/ 0</div>
+        <div class="resumen-balance-sub" id="resumen-balance-sub">flujo neto del período</div>
+      </div>
+      <!-- KPIs del período -->
+      <div class="resumen-kpis">
+        <div class="kpi green"><div class="kpi-label">Ingresos</div><div class="kpi-value green" id="res-ingresos">S/ 0</div><div class="kpi-sub" id="res-ingresos-n">0 registros</div></div>
+        <div class="kpi pink"><div class="kpi-label">Gastos</div><div class="kpi-value pink" id="res-gastos">S/ 0</div><div class="kpi-sub" id="res-gastos-n">0 registros</div></div>
+        <div class="kpi yellow"><div class="kpi-label">Tasa de ahorro</div><div class="kpi-value yellow" id="res-tasa">0%</div><div class="kpi-sub">del ingreso total</div></div>
+      </div>
+      <!-- Desglose por mes (solo si es año completo) -->
+      <div class="card" id="resumen-desglose-card">
+        <div class="card-header"><div class="card-title" id="resumen-desglose-title">Desglose mensual</div></div>
+        <div id="resumen-desglose"></div>
+      </div>
+    </div>
+
+    <!-- COSTO FIJO DE VIDA -->
+    <div class="view" id="view-costos">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Costo fijo de vida</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px">Lo que pagas todos los meses sin falta</div>
+        </div>
+        <button class="btn btn-primary" onclick="showModal('costo')">+ Agregar</button>
+      </div>
+      <!-- Total mensual -->
+      <div class="costo-total-bar">
+        <div class="costo-total-label">Total mensual fijo</div>
+        <div class="costo-total-value" id="costos-total">S/ 0</div>
+        <div class="costo-total-sub" id="costos-sub">0 conceptos registrados</div>
+      </div>
+      <!-- Comparación con ingresos -->
+      <div class="card" style="margin-bottom:20px" id="costos-vs-card">
+        <div class="card-header"><div class="card-title">Costo fijo vs. ingresos del mes</div></div>
+        <div id="costos-vs-content" style="color:var(--muted);font-size:13px">Agrega costos fijos para ver la comparación.</div>
+      </div>
+      <!-- Lista de costos -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Mis costos fijos</div>
+          <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)">cada mes</div>
+        </div>
+        <div id="lista-costos"><div class="empty"><div class="empty-icon">📌</div>Sin costos fijos registrados.<br>Agrega aquí todo lo que pagas cada mes.</div></div>
       </div>
     </div>
   </main>
@@ -402,20 +517,58 @@
   </div>
 </div>
 
+<!-- MODAL COSTO FIJO -->
+<div class="modal-overlay" id="modal-costo">
+  <div class="modal">
+    <div class="modal-title" id="costo-modal-title">Agregar costo fijo</div>
+    <input type="hidden" id="costo-edit-id">
+    <div class="form-group">
+      <label class="form-label">Nombre</label>
+      <input class="form-input" id="costo-nombre" type="text" placeholder="ej: Alquiler, Spotify, Gimnasio...">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Monto mensual (S/)</label>
+        <input class="form-input" id="costo-monto" type="number" placeholder="0.00">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Categoría</label>
+        <select class="form-select" id="costo-cat">
+          <option value="🏠 Vivienda">🏠 Vivienda</option>
+          <option value="🍔 Comida">🍔 Comida</option>
+          <option value="📱 Suscripciones">📱 Suscripciones</option>
+          <option value="🚗 Transporte">🚗 Transporte</option>
+          <option value="💄 Personal">💄 Personal</option>
+          <option value="💻 Negocio">💻 Negocio</option>
+          <option value="💊 Salud">💊 Salud</option>
+          <option value="🎓 Educación">🎓 Educación</option>
+          <option value="📦 Otros">📦 Otros</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('costo')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarCosto()">Guardar</button>
+    </div>
+  </div>
+</div>
+
 <!-- BOTTOM NAV (móvil) -->
 <nav class="bottom-nav" id="bottom-nav">
-  <div class="bottom-nav-item active" data-view="dashboard"><span class="bnav-icon">⬛</span><span class="bnav-label">Dashboard</span></div>
+  <div class="bottom-nav-item active" data-view="dashboard"><span class="bnav-icon">⬛</span><span class="bnav-label">Inicio</span></div>
   <div class="bottom-nav-item" data-view="ingresos"><span class="bnav-icon">↑</span><span class="bnav-label">Ingresos</span></div>
   <div class="bottom-nav-item" data-view="gastos"><span class="bnav-icon">↓</span><span class="bnav-label">Gastos</span></div>
   <div class="bottom-nav-item" data-view="ahorros"><span class="bnav-icon">◈</span><span class="bnav-label">Ahorros</span></div>
   <div class="bottom-nav-item" data-view="metas"><span class="bnav-icon">◎</span><span class="bnav-label">Metas</span></div>
+  <div class="bottom-nav-item" data-view="resumen"><span class="bnav-icon">📊</span><span class="bnav-label">Resumen</span></div>
+  <div class="bottom-nav-item" data-view="costos"><span class="bnav-icon">📌</span><span class="bnav-label">Costos</span></div>
 </nav>
 <div class="toast" id="toast"></div>
 
 <script>
 const API_URL = 'https://script.google.com/macros/s/AKfycbwfBfGADGPfCPoqAfiB7gYCuVHDScCdpXkC-XvEqvpVHiHd3TP-5N4PqMm5eMyRS0ZN/exec';
 
-let state = { ingresos:[], gastos:[], cuentas:[], movimientos:[], metas:[] };
+let state = { ingresos:[], gastos:[], cuentas:[], movimientos:[], metas:[], costos:[] };
 
 // ── API ──────────────────────────────────────
 async function api(params) {
@@ -441,11 +594,10 @@ async function loadData() {
     state.gastos      = data.gastos      || [];
     state.cuentas     = data.cuentas     || [];
     state.movimientos = data.movimientos || [];
-    // Metas: ahora es array, antes era objeto — migrar si es necesario
+    state.costos      = data.costos      || [];
     if (Array.isArray(data.metas)) {
       state.metas = data.metas;
     } else if (data.metas && typeof data.metas === 'object') {
-      // migración del formato viejo
       state.metas = [];
       if (data.metas.metaDepa)  state.metas.push({ id:1, nombre:'Primer depa',   emoji:'🏠', color:'#a78bfa', total: +data.metas.metaDepa,  asignado:0, desc:'Inversión en Perú' });
       if (data.metas.metaMazda) state.metas.push({ id:2, nombre:'Mazda CX-5 2026', emoji:'🚗', color:'#f472b6', total: +data.metas.metaMazda, asignado:0, desc:'El upgrade que te mereces' });
@@ -505,7 +657,6 @@ async function guardarMeta() {
   const color=document.querySelector('.color-opt.selected')?.dataset.color||'#a78bfa';
   const editId=document.getElementById('meta-edit-id').value;
   if (!nombre||!total) return showToast('Completa nombre y meta total');
-
   if (editId) {
     const idx=state.metas.findIndex(m=>m.id==editId);
     if (idx>-1) { state.metas[idx]={...state.metas[idx],nombre,desc,total,asignado,emoji,color}; }
@@ -542,6 +693,45 @@ function editarMeta(id) {
   document.querySelectorAll('.emoji-opt').forEach(e=>{ e.classList.toggle('selected', e.textContent===m.emoji); });
   document.querySelectorAll('.color-opt').forEach(c=>{ c.classList.toggle('selected', c.dataset.color===m.color); });
   showModal('meta');
+}
+
+// ── COSTOS FIJOS ──────────────────────────────
+async function guardarCosto() {
+  const nombre = document.getElementById('costo-nombre').value.trim();
+  const monto  = parseFloat(document.getElementById('costo-monto').value)||0;
+  const cat    = document.getElementById('costo-cat').value;
+  const editId = document.getElementById('costo-edit-id').value;
+  if (!nombre||!monto) return showToast('Completa nombre y monto');
+
+  if (editId) {
+    const idx = state.costos.findIndex(c=>c.id==editId);
+    if (idx>-1) state.costos[idx] = {...state.costos[idx], nombre, monto, cat};
+    closeModal('costo');
+    renderAll();
+    showToast('✓ Guardando...'); await api({action:'saveCostos', data:state.costos}); showToast('✓ Actualizado');
+  } else {
+    const item = {id:Date.now(), nombre, monto, cat};
+    state.costos.push(item);
+    renderAll(); closeModal('costo');
+    document.getElementById('costo-nombre').value=''; document.getElementById('costo-monto').value='';
+    showToast('✓ Guardando...'); await api({action:'saveCostos', data:state.costos}); showToast('✓ Costo guardado');
+  }
+}
+
+async function eliminarCosto(id) {
+  state.costos = state.costos.filter(c=>c.id!=id);
+  renderAll(); await api({action:'saveCostos', data:state.costos}); showToast('Eliminado');
+}
+
+function editarCosto(id) {
+  const c = state.costos.find(x=>x.id==id);
+  if (!c) return;
+  document.getElementById('costo-modal-title').textContent = 'Editar costo fijo';
+  document.getElementById('costo-edit-id').value  = c.id;
+  document.getElementById('costo-nombre').value   = c.nombre;
+  document.getElementById('costo-monto').value    = c.monto;
+  document.getElementById('costo-cat').value      = c.cat;
+  showModal('costo');
 }
 
 // ── Eliminar ─────────────────────────────────
@@ -581,6 +771,13 @@ function showModal(type) {
     document.querySelectorAll('.emoji-opt').forEach((e,i)=>e.classList.toggle('selected',i===0));
     document.querySelectorAll('.color-opt').forEach((c,i)=>c.classList.toggle('selected',i===0));
   }
+  if (type==='costo') {
+    document.getElementById('costo-modal-title').textContent='Agregar costo fijo';
+    document.getElementById('costo-edit-id').value='';
+    document.getElementById('costo-nombre').value='';
+    document.getElementById('costo-monto').value='';
+    document.getElementById('costo-cat').value='📦 Otros';
+  }
   document.getElementById('modal-'+type).classList.add('open');
 }
 function closeModal(type) { document.getElementById('modal-'+type).classList.remove('open'); }
@@ -617,14 +814,19 @@ function setLoading(on) { document.getElementById('loading-bar').className='load
 function setSyncStatus(ok) { document.getElementById('sync-dot').className='sync-dot '+(ok?'ok':'err'); document.getElementById('sync-label').textContent=ok?'Sincronizado':'Sin conexión'; }
 function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
 
+const MESES_NOMBRES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
 // ── Render ────────────────────────────────────
-function renderAll() { renderKPIs(); renderHistorico(); renderRecentTx(); renderFuentes(); renderListas(); renderAhorros(); renderMetas(); renderDashboardMetas(); }
+function renderAll() {
+  renderKPIs(); renderHistorico(); renderRecentTx(); renderFuentes();
+  renderListas(); renderAhorros(); renderMetas(); renderDashboardMetas();
+  renderResumen(); renderCostos();
+}
 
 function renderHistorico() {
   const totalIng  = state.ingresos.reduce((a,b)=>a+(+b.monto||0),0);
   const totalGas  = state.gastos.reduce((a,b)=>a+(+b.monto||0),0);
   const balance   = totalIng - totalGas;
-  // Meses únicos con actividad
   const meses = new Set([
     ...state.ingresos.map(i=>(i.fecha||'').slice(0,7)),
     ...state.gastos.map(g=>(g.fecha||'').slice(0,7))
@@ -639,7 +841,6 @@ function renderHistorico() {
   document.getElementById('hist-balance').style.color     = balance>=0?'var(--accent2)':'var(--danger)';
   document.getElementById('hist-meses').textContent       = nMeses>0?`${nMeses} mes${nMeses!==1?'es':''} registrados`:'desde el inicio';
 }
-
 
 function renderKPIs() {
   const {totalIng,totalGas,ingMes,gasMes}=getTotalesMes();
@@ -693,10 +894,8 @@ function renderMetas() {
   const flujo=totalIng-totalGas;
   const totalAsignado=state.metas.reduce((a,m)=>a+(+m.asignado||0),0);
   const libre=totalAhorros-totalAsignado;
-
   document.getElementById('saldo-libre').textContent=fmt(Math.max(0,libre));
   document.getElementById('saldo-libre-desc').textContent=`${fmt(totalAhorros)} total · ${fmt(totalAsignado)} asignado a metas`;
-
   const grid=document.getElementById('metas-grid');
   if (!state.metas.length) {
     grid.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="empty-icon">◎</div>No tienes metas aún.<br>Crea tu primera meta.</div>';
@@ -707,8 +906,7 @@ function renderMetas() {
       const falta=Math.max(0,total-asignado);
       const eta=flujo>0&&falta>0?`~${Math.ceil(falta/flujo)} meses al ritmo actual`:falta===0?'🎉 ¡Meta alcanzada!':'Asigna ahorro para ver proyección';
       return `<div class="meta-card"><div class="meta-card-top" style="background:${m.color}"></div>
-        <div class="meta-card-header">
-          <div></div>
+        <div class="meta-card-header"><div></div>
           <div class="meta-card-actions">
             <button class="btn-icon" onclick="editarMeta(${m.id})" title="Editar">✏️</button>
             <button class="btn-icon" onclick="eliminarMeta(${m.id})" title="Eliminar">×</button>
@@ -736,8 +934,6 @@ function renderMetas() {
       </div>`;
     }).join('');
   }
-
-  // Proyección
   const tasa=totalIng>0?Math.round(flujo/totalIng*100):0;
   document.getElementById('proyeccion-text').innerHTML = totalIng>0 ? `
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px">
@@ -768,8 +964,191 @@ function renderDashboardMetas() {
   }).join('');
 }
 
+// ── RESUMEN ───────────────────────────────────
+function renderResumen() {
+  const anio = document.getElementById('filtro-anio').value;
+  const mes  = document.getElementById('filtro-mes').value;
+
+  // Filtrar ingresos y gastos
+  let ings = state.ingresos;
+  let gas  = state.gastos;
+
+  if (anio !== 'todos') {
+    ings = ings.filter(i=>(i.fecha||'').startsWith(anio));
+    gas  = gas.filter(g=>(g.fecha||'').startsWith(anio));
+  }
+  if (mes !== 'todos') {
+    const prefix = anio !== 'todos' ? `${anio}-${mes}` : `-${mes}`;
+    if (anio !== 'todos') {
+      ings = ings.filter(i=>(i.fecha||'').startsWith(`${anio}-${mes}`));
+      gas  = gas.filter(g=>(g.fecha||'').startsWith(`${anio}-${mes}`));
+    } else {
+      ings = ings.filter(i=>(i.fecha||'').slice(5,7)===mes);
+      gas  = gas.filter(g=>(g.fecha||'').slice(5,7)===mes);
+    }
+  }
+
+  const totalIng = ings.reduce((a,b)=>a+(+b.monto||0),0);
+  const totalGas = gas.reduce((a,b)=>a+(+b.monto||0),0);
+  const balance  = totalIng - totalGas;
+  const tasa     = totalIng>0 ? Math.round(balance/totalIng*100) : 0;
+
+  // Etiqueta del período
+  let periodoLabel = '';
+  if (anio === 'todos') periodoLabel = 'Todos los períodos';
+  else if (mes === 'todos') periodoLabel = `Año ${anio} completo`;
+  else periodoLabel = `${MESES_NOMBRES[parseInt(mes)-1]} ${anio}`;
+
+  // Card resultado
+  const card = document.getElementById('resumen-result-card');
+  card.className = 'resumen-result ' + (balance>0?'positivo':balance<0?'negativo':'neutral');
+  document.getElementById('resumen-periodo-label').textContent = periodoLabel;
+  const balEl = document.getElementById('resumen-balance-value');
+  balEl.textContent = fmt(Math.abs(balance));
+  balEl.style.color = balance>0?'var(--accent)':balance<0?'var(--danger)':'var(--muted)';
+
+  let subText = '';
+  if (balance>0) subText = `✓ Flujo positivo — ahorraste ${fmt(balance)} en este período`;
+  else if (balance<0) subText = `⚠ Flujo negativo — gastaste ${fmt(Math.abs(balance))} más de lo que ingresó`;
+  else subText = 'Flujo neutro — ingresos = gastos';
+  document.getElementById('resumen-balance-sub').textContent = subText;
+
+  // KPIs
+  document.getElementById('res-ingresos').textContent = fmt(totalIng);
+  document.getElementById('res-ingresos-n').textContent = `${ings.length} registro${ings.length!==1?'s':''}`;
+  document.getElementById('res-gastos').textContent = fmt(totalGas);
+  document.getElementById('res-gastos-n').textContent = `${gas.length} registro${gas.length!==1?'s':''}`;
+  document.getElementById('res-tasa').textContent = tasa+'%';
+  document.getElementById('res-tasa').style.color = tasa>=0?'var(--warning)':'var(--danger)';
+
+  // Desglose mensual (solo cuando se ve año completo o todos)
+  const desgloseCard = document.getElementById('resumen-desglose-card');
+  const desgloseEl   = document.getElementById('resumen-desglose');
+  const desgloseTitle = document.getElementById('resumen-desglose-title');
+
+  if (mes !== 'todos') {
+    // Desglose por fuentes e ingresos del mes
+    desgloseTitle.textContent = 'Detalle del mes';
+    if (!ings.length && !gas.length) {
+      desgloseEl.innerHTML = '<div class="empty" style="padding:16px">Sin registros en este período.</div>';
+    } else {
+      const rows = [...ings.map(i=>({fecha:i.fecha,label:i.fuente,nota:i.nota||'',monto:+i.monto,tipo:'income'})),...gas.map(g=>({fecha:g.fecha,label:g.nota||g.cat,nota:g.cat,monto:+g.monto,tipo:'expense'}))].sort((a,b)=>new Date(b.fecha)-new Date(a.fecha));
+      desgloseEl.innerHTML = rows.map(r=>`<div class="tx-row"><div class="tx-left"><div class="tx-icon ${r.tipo}" style="width:24px;height:24px;font-size:11px">${r.tipo==='income'?'↑':'↓'}</div><div><div class="tx-name">${r.label}</div><div class="tx-cat">${r.nota} · ${r.fecha}</div></div></div><div class="tx-amount ${r.tipo}">${r.tipo==='income'?'+':'-'}${fmt(r.monto)}</div></div>`).join('');
+    }
+  } else {
+    // Desglose por meses
+    desgloseTitle.textContent = anio==='todos' ? 'Por año' : `Meses de ${anio}`;
+    // Agrupar por mes (o por año si todos)
+    const grupos = {};
+    const keyFn  = anio==='todos' ? (f=>(f||'').slice(0,4)) : (f=>(f||'').slice(0,7));
+    [...ings.map(i=>({...i,tipo:'income'})),...gas.map(g=>({...g,tipo:'expense'}))].forEach(item=>{
+      const k = keyFn(item.fecha);
+      if (!grupos[k]) grupos[k]={ing:0,gas:0};
+      if (item.tipo==='income') grupos[k].ing += +item.monto||0;
+      else grupos[k].gas += +item.monto||0;
+    });
+    const claves = Object.keys(grupos).sort().reverse();
+    if (!claves.length) {
+      desgloseEl.innerHTML='<div class="empty" style="padding:16px">Sin registros en este período.</div>';
+    } else {
+      desgloseEl.innerHTML=claves.map(k=>{
+        const g=grupos[k];
+        const bal=g.ing-g.gas;
+        let label = k;
+        if (anio!=='todos' && k.length===7) {
+          const [y,m]=k.split('-');
+          label=`${MESES_NOMBRES[parseInt(m)-1]} ${y}`;
+        }
+        return `<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)">
+          <div style="font-weight:500;font-size:13px">${label}</div>
+          <div style="display:flex;gap:24px;align-items:center;font-family:'DM Mono',monospace;font-size:12px">
+            <span style="color:var(--accent)">+${fmt(g.ing)}</span>
+            <span style="color:var(--danger)">-${fmt(g.gas)}</span>
+            <span style="font-size:13px;font-weight:700;color:${bal>=0?'var(--accent2)':'var(--danger)'}">${bal>=0?'+':''}${fmt(bal)}</span>
+          </div>
+        </div>`;
+      }).join('');
+    }
+  }
+}
+
+// ── COSTOS FIJOS ──────────────────────────────
+const CAT_COLORS = {
+  '🏠 Vivienda':'#38bdf8','🍔 Comida':'#fb923c','📱 Suscripciones':'#a78bfa',
+  '🚗 Transporte':'#7fff6e','💄 Personal':'#f472b6','💻 Negocio':'#34d399',
+  '💊 Salud':'#f87171','🎓 Educación':'#fbbf24','📦 Otros':'#666680'
+};
+
+function renderCostos() {
+  const total = state.costos.reduce((a,c)=>a+(+c.monto||0),0);
+  document.getElementById('costos-total').textContent = fmt(total);
+  document.getElementById('costos-sub').textContent = `${state.costos.length} concepto${state.costos.length!==1?'s':''} registrado${state.costos.length!==1?'s':''}`;
+
+  // Comparación con ingresos del mes
+  const {totalIng} = getTotalesMes();
+  const vsEl = document.getElementById('costos-vs-content');
+  if (!state.costos.length) {
+    vsEl.innerHTML='<div style="color:var(--muted);font-size:13px">Agrega costos fijos para ver la comparación.</div>';
+  } else {
+    const pct = totalIng>0 ? Math.round(total/totalIng*100) : 0;
+    const libre = totalIng - total;
+    vsEl.innerHTML=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px">
+      <div style="text-align:center">
+        <div style="font-family:'DM Mono',monospace;font-size:20px;color:var(--accent)">${fmt(totalIng)}</div>
+        <div style="color:var(--muted);font-size:11px;margin-top:4px">Ingresos del mes</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-family:'DM Mono',monospace;font-size:20px;color:var(--warning)">${fmt(total)}</div>
+        <div style="color:var(--muted);font-size:11px;margin-top:4px">Costo fijo mensual</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-family:'DM Mono',monospace;font-size:20px;color:${libre>=0?'var(--accent2)':'var(--danger)'}">${fmt(libre)}</div>
+        <div style="color:var(--muted);font-size:11px;margin-top:4px">Libre después de costos</div>
+      </div>
+    </div>
+    <div style="background:var(--border);border-radius:99px;height:8px;margin-bottom:8px;overflow:hidden">
+      <div style="height:100%;border-radius:99px;background:var(--warning);width:${Math.min(100,pct)}%;transition:width .6s"></div>
+    </div>
+    <div style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace">${pct}% de tus ingresos van a costos fijos</div>`;
+  }
+
+  // Lista de costos
+  const liEl = document.getElementById('lista-costos');
+  if (!state.costos.length) {
+    liEl.innerHTML='<div class="empty"><div class="empty-icon">📌</div>Sin costos fijos registrados.<br>Agrega aquí todo lo que pagas cada mes.</div>';
+    return;
+  }
+  // Agrupar por categoría
+  const porCat = {};
+  state.costos.forEach(c=>{
+    if (!porCat[c.cat]) porCat[c.cat]=[];
+    porCat[c.cat].push(c);
+  });
+  liEl.innerHTML=state.costos.sort((a,b)=>b.monto-a.monto).map(c=>{
+    const color = CAT_COLORS[c.cat]||'#666680';
+    return `<div class="costo-row">
+      <div class="costo-left">
+        <div class="costo-cat-dot" style="background:${color}"></div>
+        <div>
+          <div class="costo-name">${c.nombre}</div>
+          <div class="costo-cat">${c.cat}</div>
+        </div>
+      </div>
+      <div class="costo-right">
+        <div class="costo-monto">${fmt(c.monto)}</div>
+        <button class="btn-icon" onclick="editarCosto(${c.id})" title="Editar">✏️</button>
+        <button class="btn-icon" onclick="eliminarCosto(${c.id})" title="Eliminar">×</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 // ── Init ──────────────────────────────────────
 document.getElementById('fecha-hoy').textContent=new Date().toLocaleDateString('es-PE',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+// Pre-seleccionar mes actual en filtro resumen
+const _hoy = new Date();
+document.getElementById('filtro-anio').value = String(_hoy.getFullYear());
+document.getElementById('filtro-mes').value  = String(_hoy.getMonth()+1).padStart(2,'0');
 loadData();
 </script>
 </body>
