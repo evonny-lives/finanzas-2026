@@ -435,9 +435,7 @@
   <div class="modal">
     <div class="modal-title">Registrar ingreso</div>
     <div class="form-group"><label class="form-label">Fuente</label>
-      <select class="form-select" id="ing-fuente">
-        <option>Hotmart</option><option>Maquinarias Pineda</option><option>Elle Studio</option><option>MRK Alisados</option><option>Otro</option>
-      </select>
+      <input class="form-input" id="ing-fuente" type="text" placeholder="ej: Hotmart, Cliente X, Comisión...">
     </div>
     <div class="form-row">
       <div class="form-group"><label class="form-label">Monto (S/)</label><input class="form-input" id="ing-monto" type="number" placeholder="0.00"></div>
@@ -462,6 +460,19 @@
       <div class="form-group"><label class="form-label">Fecha</label><input class="form-input" id="gas-fecha" type="date"></div>
     </div>
     <div class="form-group"><label class="form-label">Descripción</label><input class="form-input" id="gas-nota" type="text" placeholder="ej: Spotify, Rappi..."></div>
+    <div class="form-group"><label class="form-label">Medio de pago <span style="color:var(--muted);font-size:11px">(opcional)</span></label>
+      <select class="form-select" id="gas-medio">
+        <option value="">— Sin especificar —</option>
+        <option>Yape</option>
+        <option>TC BBVA</option>
+        <option>TC BCP</option>
+        <option>TC Amex</option>
+        <option>TD Ripley</option>
+        <option>TD BCP</option>
+        <option>Efectivo</option>
+        <option>Transferencia</option>
+      </select>
+    </div>
     <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal('gasto')">Cancelar</button><button class="btn btn-primary" onclick="guardarGasto()">Guardar</button></div>
   </div>
 </div>
@@ -647,11 +658,11 @@ async function guardarIngreso() {
 }
 
 async function guardarGasto() {
-  const cat=document.getElementById('gas-cat').value, monto=parseFloat(document.getElementById('gas-monto').value), fecha=document.getElementById('gas-fecha').value, nota=document.getElementById('gas-nota').value;
+  const cat=document.getElementById('gas-cat').value, monto=parseFloat(document.getElementById('gas-monto').value), fecha=document.getElementById('gas-fecha').value, nota=document.getElementById('gas-nota').value, medio=document.getElementById('gas-medio').value;
   if (!monto||!fecha) return showToast('Completa monto y fecha');
-  const item={id:Date.now(),cat,monto,fecha,nota};
+  const item={id:Date.now(),cat,monto,fecha,nota,medio};
   state.gastos.push(item); renderAll(); closeModal('gasto');
-  document.getElementById('gas-monto').value=''; document.getElementById('gas-nota').value='';
+  document.getElementById('gas-monto').value=''; document.getElementById('gas-nota').value=''; document.getElementById('gas-medio').value='';
   showToast('✓ Guardando...'); await api({action:'addGasto',data:item}); showToast('✓ Gasto guardado');
 }
 
@@ -928,7 +939,7 @@ function renderListas() {
   const resGas  = document.getElementById('resumen-gas-filtro');
   if (resGas) resGas.innerHTML = gas.length ? `<span style="color:var(--danger)">-${fmt(totalGas)}</span><span style="color:var(--muted)">(${gas.length} registros)</span>` : '';
   if (!gas.length) { liGas.innerHTML='<div class="empty"><div class="empty-icon">🧾</div>Sin gastos en este período.</div>'; }
-  else liGas.innerHTML=[...gas].sort((a,b)=>new Date(b.fecha)-new Date(a.fecha)).map(g=>`<div class="tx-row"><div class="tx-left"><div class="tx-icon expense">↓</div><div><div class="tx-name">${g.nota||g.cat}</div><div class="tx-cat">${g.cat} · ${g.fecha}</div></div></div><div style="display:flex;align-items:center;gap:12px"><div class="tx-amount expense">-${fmt(g.monto)}</div><button onclick="eliminarGasto(${g.id})" class="btn-icon">×</button></div></div>`).join('');
+  else liGas.innerHTML=[...gas].sort((a,b)=>new Date(b.fecha)-new Date(a.fecha)).map(g=>`<div class="tx-row"><div class="tx-left"><div class="tx-icon expense">↓</div><div><div class="tx-name">${g.nota||g.cat}</div><div class="tx-cat">${g.cat} · ${g.fecha}${g.medio?` · <span style="color:var(--warning);font-size:10px">${g.medio}</span>`:''}</div></div></div><div style="display:flex;align-items:center;gap:12px"><div class="tx-amount expense">-${fmt(g.monto)}</div><button onclick="eliminarGasto(${g.id})" class="btn-icon">×</button></div></div>`).join('');
 }
 
 function renderAhorros() {
