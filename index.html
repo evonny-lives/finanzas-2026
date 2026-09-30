@@ -282,12 +282,42 @@
     <!-- INGRESOS -->
     <div class="view" id="view-ingresos">
       <div class="page-header"><div class="page-title">Ingresos</div><button class="btn btn-primary" onclick="showModal('ingreso')">+ Registrar</button></div>
+      <div class="filter-bar" style="margin-bottom:16px">
+        <select class="filter-select" id="filtro-ing-anio" onchange="renderListas()">
+          <option value="todos">Todos los años</option>
+          <option value="2026" selected>2026</option>
+          <option value="2027">2027</option>
+        </select>
+        <select class="filter-select" id="filtro-ing-mes" onchange="renderListas()">
+          <option value="todos">Todo el año</option>
+          <option value="01">Enero</option><option value="02">Febrero</option><option value="03">Marzo</option>
+          <option value="04">Abril</option><option value="05">Mayo</option><option value="06">Junio</option>
+          <option value="07">Julio</option><option value="08">Agosto</option><option value="09">Septiembre</option>
+          <option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option>
+        </select>
+        <div id="resumen-ing-filtro" style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px"></div>
+      </div>
       <div class="card"><div id="lista-ingresos"><div class="empty"><div class="empty-icon">💸</div>Sin ingresos registrados.</div></div></div>
     </div>
 
     <!-- GASTOS -->
     <div class="view" id="view-gastos">
       <div class="page-header"><div class="page-title">Gastos</div><button class="btn btn-primary" onclick="showModal('gasto')">+ Registrar</button></div>
+      <div class="filter-bar" style="margin-bottom:16px">
+        <select class="filter-select" id="filtro-gas-anio" onchange="renderListas()">
+          <option value="todos">Todos los años</option>
+          <option value="2026" selected>2026</option>
+          <option value="2027">2027</option>
+        </select>
+        <select class="filter-select" id="filtro-gas-mes" onchange="renderListas()">
+          <option value="todos">Todo el año</option>
+          <option value="01">Enero</option><option value="02">Febrero</option><option value="03">Marzo</option>
+          <option value="04">Abril</option><option value="05">Mayo</option><option value="06">Junio</option>
+          <option value="07">Julio</option><option value="08">Agosto</option><option value="09">Septiembre</option>
+          <option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option>
+        </select>
+        <div id="resumen-gas-filtro" style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px"></div>
+      </div>
       <div class="card"><div id="lista-gastos"><div class="empty"><div class="empty-icon">🧾</div>Sin gastos registrados.</div></div></div>
     </div>
 
@@ -867,13 +897,38 @@ function renderFuentes() {
   });
 }
 
+function filtrarPorPeriodo(arr, anio, mes) {
+  let out = arr;
+  if (anio !== 'todos') out = out.filter(x=>(x.fecha||'').startsWith(anio));
+  if (mes !== 'todos') {
+    if (anio !== 'todos') out = out.filter(x=>(x.fecha||'').startsWith(`${anio}-${mes}`));
+    else out = out.filter(x=>(x.fecha||'').slice(5,7)===mes);
+  }
+  return out;
+}
+
 function renderListas() {
-  const liIng=document.getElementById('lista-ingresos');
-  if (!state.ingresos.length) { liIng.innerHTML='<div class="empty"><div class="empty-icon">💸</div>Sin ingresos.</div>'; }
-  else liIng.innerHTML=[...state.ingresos].sort((a,b)=>new Date(b.fecha)-new Date(a.fecha)).map(i=>`<div class="tx-row"><div class="tx-left"><div class="tx-icon income">↑</div><div><div class="tx-name">${i.fuente}</div><div class="tx-cat">${i.nota||'—'} · ${i.fecha}</div></div></div><div style="display:flex;align-items:center;gap:12px"><div class="tx-amount income">+${fmt(i.monto)}</div><button onclick="eliminarIngreso(${i.id})" class="btn-icon">×</button></div></div>`).join('');
-  const liGas=document.getElementById('lista-gastos');
-  if (!state.gastos.length) { liGas.innerHTML='<div class="empty"><div class="empty-icon">🧾</div>Sin gastos.</div>'; }
-  else liGas.innerHTML=[...state.gastos].sort((a,b)=>new Date(b.fecha)-new Date(a.fecha)).map(g=>`<div class="tx-row"><div class="tx-left"><div class="tx-icon expense">↓</div><div><div class="tx-name">${g.nota||g.cat}</div><div class="tx-cat">${g.cat} · ${g.fecha}</div></div></div><div style="display:flex;align-items:center;gap:12px"><div class="tx-amount expense">-${fmt(g.monto)}</div><button onclick="eliminarGasto(${g.id})" class="btn-icon">×</button></div></div>`).join('');
+  // — Ingresos —
+  const ingAnio = (document.getElementById('filtro-ing-anio')||{value:'todos'}).value;
+  const ingMes  = (document.getElementById('filtro-ing-mes') ||{value:'todos'}).value;
+  const ings    = filtrarPorPeriodo(state.ingresos, ingAnio, ingMes);
+  const liIng   = document.getElementById('lista-ingresos');
+  const totalIng = ings.reduce((a,b)=>a+(+b.monto||0),0);
+  const resIng  = document.getElementById('resumen-ing-filtro');
+  if (resIng) resIng.innerHTML = ings.length ? `<span style="color:var(--accent)">+${fmt(totalIng)}</span><span style="color:var(--muted)">(${ings.length} registros)</span>` : '';
+  if (!ings.length) { liIng.innerHTML='<div class="empty"><div class="empty-icon">💸</div>Sin ingresos en este período.</div>'; }
+  else liIng.innerHTML=[...ings].sort((a,b)=>new Date(b.fecha)-new Date(a.fecha)).map(i=>`<div class="tx-row"><div class="tx-left"><div class="tx-icon income">↑</div><div><div class="tx-name">${i.fuente}</div><div class="tx-cat">${i.nota||'—'} · ${i.fecha}</div></div></div><div style="display:flex;align-items:center;gap:12px"><div class="tx-amount income">+${fmt(i.monto)}</div><button onclick="eliminarIngreso(${i.id})" class="btn-icon">×</button></div></div>`).join('');
+
+  // — Gastos —
+  const gasAnio = (document.getElementById('filtro-gas-anio')||{value:'todos'}).value;
+  const gasMes  = (document.getElementById('filtro-gas-mes') ||{value:'todos'}).value;
+  const gas     = filtrarPorPeriodo(state.gastos, gasAnio, gasMes);
+  const liGas   = document.getElementById('lista-gastos');
+  const totalGas = gas.reduce((a,b)=>a+(+b.monto||0),0);
+  const resGas  = document.getElementById('resumen-gas-filtro');
+  if (resGas) resGas.innerHTML = gas.length ? `<span style="color:var(--danger)">-${fmt(totalGas)}</span><span style="color:var(--muted)">(${gas.length} registros)</span>` : '';
+  if (!gas.length) { liGas.innerHTML='<div class="empty"><div class="empty-icon">🧾</div>Sin gastos en este período.</div>'; }
+  else liGas.innerHTML=[...gas].sort((a,b)=>new Date(b.fecha)-new Date(a.fecha)).map(g=>`<div class="tx-row"><div class="tx-left"><div class="tx-icon expense">↓</div><div><div class="tx-name">${g.nota||g.cat}</div><div class="tx-cat">${g.cat} · ${g.fecha}</div></div></div><div style="display:flex;align-items:center;gap:12px"><div class="tx-amount expense">-${fmt(g.monto)}</div><button onclick="eliminarGasto(${g.id})" class="btn-icon">×</button></div></div>`).join('');
 }
 
 function renderAhorros() {
@@ -969,7 +1024,7 @@ function renderResumen() {
   const anio = document.getElementById('filtro-anio').value;
   const mes  = document.getElementById('filtro-mes').value;
 
-  // Filtrar ingresos y gastos
+  // Filtrar ingresos y gastos variables
   let ings = state.ingresos;
   let gas  = state.gastos;
 
@@ -978,7 +1033,6 @@ function renderResumen() {
     gas  = gas.filter(g=>(g.fecha||'').startsWith(anio));
   }
   if (mes !== 'todos') {
-    const prefix = anio !== 'todos' ? `${anio}-${mes}` : `-${mes}`;
     if (anio !== 'todos') {
       ings = ings.filter(i=>(i.fecha||'').startsWith(`${anio}-${mes}`));
       gas  = gas.filter(g=>(g.fecha||'').startsWith(`${anio}-${mes}`));
@@ -988,10 +1042,42 @@ function renderResumen() {
     }
   }
 
-  const totalIng = ings.reduce((a,b)=>a+(+b.monto||0),0);
-  const totalGas = gas.reduce((a,b)=>a+(+b.monto||0),0);
-  const balance  = totalIng - totalGas;
-  const tasa     = totalIng>0 ? Math.round(balance/totalIng*100) : 0;
+  const totalIng    = ings.reduce((a,b)=>a+(+b.monto||0),0);
+  const gastoVar    = gas.reduce((a,b)=>a+(+b.monto||0),0);
+  const totalCostos = state.costos.reduce((a,c)=>a+(+c.monto||0),0);
+
+  // Cuántos meses cubre el período → multiplicar costos fijos
+  let mesesPeriodo = 1;
+  if (mes === 'todos') {
+    if (anio === 'todos') {
+      // contar años únicos con actividad
+      const anios = new Set([
+        ...state.ingresos.map(i=>(i.fecha||'').slice(0,4)),
+        ...state.gastos.map(g=>(g.fecha||'').slice(0,4))
+      ]);
+      anios.delete('');
+      // aproximar: contar meses únicos con actividad
+      const mesesSet = new Set([
+        ...state.ingresos.map(i=>(i.fecha||'').slice(0,7)),
+        ...state.gastos.map(g=>(g.fecha||'').slice(0,7))
+      ]);
+      mesesSet.delete('');
+      mesesPeriodo = Math.max(1, mesesSet.size);
+    } else {
+      // contar meses únicos del año con actividad
+      const mesesSet = new Set([
+        ...ings.map(i=>(i.fecha||'').slice(0,7)),
+        ...gas.map(g=>(g.fecha||'').slice(0,7))
+      ]);
+      mesesSet.delete('');
+      mesesPeriodo = Math.max(1, mesesSet.size);
+    }
+  }
+
+  const costosFijosTotal = totalCostos * mesesPeriodo;
+  const gastoReal   = gastoVar + costosFijosTotal;
+  const balance     = totalIng - gastoReal;
+  const tasa        = totalIng>0 ? Math.round(balance/totalIng*100) : 0;
 
   // Etiqueta del período
   let periodoLabel = '';
@@ -1008,52 +1094,71 @@ function renderResumen() {
   balEl.style.color = balance>0?'var(--accent)':balance<0?'var(--danger)':'var(--muted)';
 
   let subText = '';
-  if (balance>0) subText = `✓ Flujo positivo — ahorraste ${fmt(balance)} en este período`;
-  else if (balance<0) subText = `⚠ Flujo negativo — gastaste ${fmt(Math.abs(balance))} más de lo que ingresó`;
-  else subText = 'Flujo neutro — ingresos = gastos';
+  if (balance>0) subText = `✓ Flujo real positivo — te quedaron ${fmt(balance)} libres`;
+  else if (balance<0) subText = `⚠ Flujo real negativo — gastaste ${fmt(Math.abs(balance))} más de lo que ingresó`;
+  else subText = 'Flujo neutro — ingresos = gasto real';
   document.getElementById('resumen-balance-sub').textContent = subText;
 
-  // KPIs
+  // KPIs — ahora gastos = variable + fijos
   document.getElementById('res-ingresos').textContent = fmt(totalIng);
   document.getElementById('res-ingresos-n').textContent = `${ings.length} registro${ings.length!==1?'s':''}`;
-  document.getElementById('res-gastos').textContent = fmt(totalGas);
-  document.getElementById('res-gastos-n').textContent = `${gas.length} registro${gas.length!==1?'s':''}`;
+  document.getElementById('res-gastos').textContent = fmt(gastoReal);
+  document.getElementById('res-gastos-n').textContent = `${fmt(gastoVar)} variable + ${fmt(costosFijosTotal)} fijo`;
   document.getElementById('res-tasa').textContent = tasa+'%';
-  document.getElementById('res-tasa').style.color = tasa>=0?'var(--warning)':'var(--danger)';
+  document.getElementById('res-tasa').style.color = tasa>0?'var(--accent)':tasa===0?'var(--warning)':'var(--danger)';
 
-  // Desglose mensual (solo cuando se ve año completo o todos)
-  const desgloseCard = document.getElementById('resumen-desglose-card');
-  const desgloseEl   = document.getElementById('resumen-desglose');
+  // Bloque desglose de gastos del período
+  const desgloseEl    = document.getElementById('resumen-desglose');
   const desgloseTitle = document.getElementById('resumen-desglose-title');
 
   if (mes !== 'todos') {
-    // Desglose por fuentes e ingresos del mes
     desgloseTitle.textContent = 'Detalle del mes';
-    if (!ings.length && !gas.length) {
-      desgloseEl.innerHTML = '<div class="empty" style="padding:16px">Sin registros en este período.</div>';
-    } else {
-      const rows = [...ings.map(i=>({fecha:i.fecha,label:i.fuente,nota:i.nota||'',monto:+i.monto,tipo:'income'})),...gas.map(g=>({fecha:g.fecha,label:g.nota||g.cat,nota:g.cat,monto:+g.monto,tipo:'expense'}))].sort((a,b)=>new Date(b.fecha)-new Date(a.fecha));
-      desgloseEl.innerHTML = rows.map(r=>`<div class="tx-row"><div class="tx-left"><div class="tx-icon ${r.tipo}" style="width:24px;height:24px;font-size:11px">${r.tipo==='income'?'↑':'↓'}</div><div><div class="tx-name">${r.label}</div><div class="tx-cat">${r.nota} · ${r.fecha}</div></div></div><div class="tx-amount ${r.tipo}">${r.tipo==='income'?'+':'-'}${fmt(r.monto)}</div></div>`).join('');
-    }
+    // Sección costos fijos siempre visible si existen
+    const fijoHTML = state.costos.length ? `
+      <div style="background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.15);border-radius:10px;padding:14px;margin-bottom:14px">
+        <div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--warning);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">📌 Costos fijos del mes</div>
+        ${state.costos.sort((a,b)=>b.monto-a.monto).map(c=>`
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px">
+            <span style="color:var(--muted)">${c.nombre} <span style="font-size:10px;opacity:.6">${c.cat}</span></span>
+            <span style="font-family:'DM Mono',monospace;color:var(--warning)">-${fmt(c.monto)}</span>
+          </div>`).join('')}
+        <div style="display:flex;justify-content:space-between;margin-top:10px;font-family:'DM Mono',monospace;font-size:13px;font-weight:700">
+          <span style="color:var(--muted)">Subtotal fijos</span>
+          <span style="color:var(--warning)">-${fmt(totalCostos)}</span>
+        </div>
+      </div>` : '';
+
+    const varRows = [...ings.map(i=>({fecha:i.fecha,label:i.fuente,nota:i.nota||'',monto:+i.monto,tipo:'income'})),...gas.map(g=>({fecha:g.fecha,label:g.nota||g.cat,nota:g.cat,monto:+g.monto,tipo:'expense'}))].sort((a,b)=>new Date(b.fecha)-new Date(a.fecha));
+
+    const varHTML = varRows.length ? `
+      <div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Movimientos registrados</div>
+      ${varRows.map(r=>`<div class="tx-row"><div class="tx-left"><div class="tx-icon ${r.tipo}" style="width:24px;height:24px;font-size:11px">${r.tipo==='income'?'↑':'↓'}</div><div><div class="tx-name">${r.label}</div><div class="tx-cat">${r.nota} · ${r.fecha}</div></div></div><div class="tx-amount ${r.tipo}">${r.tipo==='income'?'+':'-'}${fmt(r.monto)}</div></div>`).join('')}` :
+      '<div style="color:var(--muted);font-size:13px;padding:8px 0">Sin ingresos ni gastos variables registrados este mes.</div>';
+
+    desgloseEl.innerHTML = fijoHTML + varHTML;
+
   } else {
-    // Desglose por meses
-    desgloseTitle.textContent = anio==='todos' ? 'Por año' : `Meses de ${anio}`;
-    // Agrupar por mes (o por año si todos)
+    desgloseTitle.textContent = anio==='todos' ? 'Por año' : `Meses de ${anio} (incluye costos fijos)`;
     const grupos = {};
     const keyFn  = anio==='todos' ? (f=>(f||'').slice(0,4)) : (f=>(f||'').slice(0,7));
     [...ings.map(i=>({...i,tipo:'income'})),...gas.map(g=>({...g,tipo:'expense'}))].forEach(item=>{
       const k = keyFn(item.fecha);
-      if (!grupos[k]) grupos[k]={ing:0,gas:0};
+      if (!grupos[k]) grupos[k]={ing:0,gasVar:0};
       if (item.tipo==='income') grupos[k].ing += +item.monto||0;
-      else grupos[k].gas += +item.monto||0;
+      else grupos[k].gasVar += +item.monto||0;
     });
     const claves = Object.keys(grupos).sort().reverse();
     if (!claves.length) {
       desgloseEl.innerHTML='<div class="empty" style="padding:16px">Sin registros en este período.</div>';
     } else {
-      desgloseEl.innerHTML=claves.map(k=>{
+      // Header columnas
+      desgloseEl.innerHTML=`<div style="display:flex;justify-content:space-between;padding:6px 0 10px;border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px">
+        <span>Período</span>
+        <div style="display:flex;gap:20px"><span>Ingresos</span><span>Gasto real</span><span>Balance</span></div>
+      </div>`+claves.map(k=>{
         const g=grupos[k];
-        const bal=g.ing-g.gas;
+        const gasTotal = g.gasVar + totalCostos; // costos fijos por cada mes/año
+        const bal = g.ing - gasTotal;
         let label = k;
         if (anio!=='todos' && k.length===7) {
           const [y,m]=k.split('-');
@@ -1061,13 +1166,16 @@ function renderResumen() {
         }
         return `<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)">
           <div style="font-weight:500;font-size:13px">${label}</div>
-          <div style="display:flex;gap:24px;align-items:center;font-family:'DM Mono',monospace;font-size:12px">
+          <div style="display:flex;gap:20px;align-items:center;font-family:'DM Mono',monospace;font-size:12px">
             <span style="color:var(--accent)">+${fmt(g.ing)}</span>
-            <span style="color:var(--danger)">-${fmt(g.gas)}</span>
-            <span style="font-size:13px;font-weight:700;color:${bal>=0?'var(--accent2)':'var(--danger)'}">${bal>=0?'+':''}${fmt(bal)}</span>
+            <span style="color:var(--danger)">-${fmt(gasTotal)}</span>
+            <span style="font-size:13px;font-weight:700;min-width:80px;text-align:right;color:${bal>=0?'var(--accent2)':'var(--danger)'}">${bal>=0?'+':''}${fmt(bal)}</span>
           </div>
         </div>`;
       }).join('');
+      if (totalCostos>0) {
+        desgloseEl.innerHTML += `<div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;padding:10px 0 0;opacity:.7">* Gasto real incluye ${fmt(totalCostos)}/mes de costos fijos</div>`;
+      }
     }
   }
 }
