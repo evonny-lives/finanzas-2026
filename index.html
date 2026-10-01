@@ -863,18 +863,20 @@ function renderAll() {
 
 function renderHistorico() {
   const totalIng  = state.ingresos.reduce((a,b)=>a+(+b.monto||0),0);
-  const totalGas  = state.gastos.reduce((a,b)=>a+(+b.monto||0),0);
-  const balance   = totalIng - totalGas;
+  const totalGasVar = state.gastos.reduce((a,b)=>a+(+b.monto||0),0);
   const meses = new Set([
     ...state.ingresos.map(i=>(i.fecha||'').slice(0,7)),
     ...state.gastos.map(g=>(g.fecha||'').slice(0,7))
   ]);
   meses.delete('');
-  const nMeses = meses.size;
+  const nMeses = Math.max(1, meses.size);
+  const costosFijos = state.costos.reduce((a,c)=>a+(+c.monto||0),0);
+  const totalGas  = totalGasVar + costosFijos * nMeses;
+  const balance   = totalIng - totalGas;
   document.getElementById('hist-ingresos').textContent    = fmt(totalIng);
   document.getElementById('hist-ingresos-sub').textContent= `${state.ingresos.length} registros en total`;
   document.getElementById('hist-gastos').textContent      = fmt(totalGas);
-  document.getElementById('hist-gastos-sub').textContent  = `${state.gastos.length} registros en total`;
+  document.getElementById('hist-gastos-sub').textContent  = `var + ${fmt(costosFijos)}/mes × ${nMeses} meses`;
   document.getElementById('hist-balance').textContent     = fmt(balance);
   document.getElementById('hist-balance').style.color     = balance>=0?'var(--accent2)':'var(--danger)';
   document.getElementById('hist-meses').textContent       = nMeses>0?`${nMeses} mes${nMeses!==1?'es':''} registrados`:'desde el inicio';
@@ -882,12 +884,15 @@ function renderHistorico() {
 
 function renderKPIs() {
   const {totalIng,totalGas,ingMes,gasMes}=getTotalesMes();
-  const flujo=totalIng-totalGas, total=getTotalAhorros();
+  const costosFijos=state.costos.reduce((a,c)=>a+(+c.monto||0),0);
+  const gastoReal=totalGas+costosFijos;
+  const flujo=totalIng-gastoReal, total=getTotalAhorros();
   document.getElementById('kpi-ingresos').textContent=fmt(totalIng);
   document.getElementById('kpi-ingresos-sub').textContent=`${ingMes.length} registro${ingMes.length!==1?'s':''}`;
-  document.getElementById('kpi-gastos').textContent=fmt(totalGas);
-  document.getElementById('kpi-gastos-sub').textContent=`${gasMes.length} registro${gasMes.length!==1?'s':''}`;
+  document.getElementById('kpi-gastos').textContent=fmt(gastoReal);
+  document.getElementById('kpi-gastos-sub').textContent=`${fmt(totalGas)} var + ${fmt(costosFijos)} fijo`;
   document.getElementById('kpi-flujo').textContent=fmt(flujo);
+  document.getElementById('kpi-flujo').style.color=flujo>=0?'var(--accent2)':'var(--danger)';
   document.getElementById('kpi-ahorros').textContent=fmt(total);
 }
 
